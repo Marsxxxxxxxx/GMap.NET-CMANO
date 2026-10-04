@@ -61,6 +61,8 @@ Preview 2 在 Windows 10 1703 及更新版本（包括 Windows 11）上启用 `P
 
 脚本优先使用 `.tools/dotnet/dotnet.exe`，没有项目内 SDK 时使用系统 `dotnet`。依赖缓存、验证输出和 SDK 都不纳入 Git。
 
+两个项目都显式引用 `Microsoft.NETFramework.ReferenceAssemblies 1.0.3`，由 NuGet 提供 .NET Framework 4.8 引用程序集。这样，无论构建机器是否安装开发包，锁定还原都使用相同的依赖列表；运行程序仍需要 .NET Framework 4.8。
+
 构建脚本执行锁定依赖还原、Release 编译、离线验证和打包。最终文件在 `dist/` 中，并附 SHA-256 校验文件。源码可以在不保留原始 EXE / DLL 的新电脑上构建；不需要再次反编译。
 
 构建脚本也会在项目根目录生成 `Release/` 子目录，内含可直接运行的 `GMap.NET_CMANO.exe`、相关 DLL 和 SQLite 原生依赖。双击其中的 EXE 即可运行；复制到其他位置时应复制整个 `Release/` 目录。

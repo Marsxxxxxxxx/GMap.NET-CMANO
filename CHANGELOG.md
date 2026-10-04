@@ -1,5 +1,11 @@
 # 版本记录
 
+## 构建修复 — 2026-10-05
+
+- 在主程序和验证项目中显式引用 `Microsoft.NETFramework.ReferenceAssemblies 1.0.3`，统一已安装与未安装 .NET Framework 开发包时的依赖列表，修复 GitHub Actions 锁定还原报 NU1004 的问题。
+- 由 NuGet 重新生成两个锁文件；实际解析出的包版本和内容校验值保持一致，构建继续使用 `--locked-mode`。
+- 还原失败提示改为引导查看具体 NuGet 错误，避免将依赖锁文件不一致误判为缺少 SDK。
+
 ## 2.1.7-cmano.2-preview — 2026-10-04
 
 - 为 .NET Framework 4.8 启用 PerMonitorV2，改善 4K 显示器使用 150% 缩放时文字和控件的模糊问题。

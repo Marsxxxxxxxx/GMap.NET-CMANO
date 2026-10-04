@@ -17,7 +17,7 @@ $testProject = Join-Path $projectRoot 'tests\GMap.NET.CMANO.SmokeTests\GMap.NET.
 Push-Location $projectRoot
 try {
     & $dotnet restore $testProject --locked-mode --nologo
-    if ($LASTEXITCODE -ne 0) { throw 'Dependency restore failed. Install a .NET 10 SDK if no SDK was found.' }
+    if ($LASTEXITCODE -ne 0) { throw 'Dependency restore failed. See the NuGet errors above; NU1004 indicates that the project dependencies do not match packages.lock.json.' }
     & $dotnet build $testProject -c $Configuration --no-restore --nologo
     if ($LASTEXITCODE -ne 0) { throw 'Build failed.' }
 
