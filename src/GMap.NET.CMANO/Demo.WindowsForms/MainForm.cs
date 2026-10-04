@@ -3643,8 +3643,8 @@ public class MainForm : Form
 		this.radioButtonVehicle.Text = "Vehicle demo";
 		this.radioButtonVehicle.UseVisualStyleBackColor = true;
 		this.radioButtonVehicle.CheckedChanged += new System.EventHandler(this.RealTimeChanged);
-		base.AutoScaleDimensions = new System.Drawing.SizeF(6f, 13f);
-		base.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+		base.AutoScaleDimensions = new System.Drawing.SizeF(96f, 96f);
+		base.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 		this.BackColor = System.Drawing.Color.AliceBlue;
 		base.ClientSize = new System.Drawing.Size(891, 821);
 		base.Controls.Add(this.panel4);
@@ -3652,7 +3652,7 @@ public class MainForm : Form
 		this.MinimumSize = new System.Drawing.Size(554, 106);
 		base.Name = "MainForm";
 		base.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-		this.Text = "GMap.NET CMANO - 2.1.7 Preview";
+		this.Text = "GMap.NET CMANO - 2.1.7 Preview 2 (High DPI)";
 		base.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 		base.Load += new System.EventHandler(this.MainForm_Load);
 		base.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MainForm_KeyPress);

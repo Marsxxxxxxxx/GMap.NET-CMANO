@@ -25,6 +25,8 @@ public class XPanderPanelList : ScrollableControl
 
 	private int m_iCaptionHeight;
 
+	private float m_scaledCaptionHeight;
+
 	private LinearGradientMode m_linearGradientMode;
 
 	private Color m_colorGradientBackground;
@@ -257,6 +259,7 @@ public class XPanderPanelList : ScrollableControl
 				throw new InvalidOperationException(string.Format(CultureInfo.CurrentUICulture, Resources.IDS_InvalidOperationExceptionInteger, new object[3] { value, "CaptionHeight", 18 }));
 			}
 			m_iCaptionHeight = value;
+			m_scaledCaptionHeight = value;
 			OnCaptionHeightChanged(this, EventArgs.Empty);
 		}
 	}
@@ -306,6 +309,18 @@ public class XPanderPanelList : ScrollableControl
 			}
 		}
 		TypeDescriptor.GetProperties(xPanderPanel)["Expand"]?.SetValue(xPanderPanel, true);
+	}
+
+	protected override void ScaleControl(SizeF factor, BoundsSpecified specified)
+	{
+		// Child panels scale their own captions; do not propagate CaptionHeight
+		// here, or the child metrics would be scaled twice.
+		if ((specified & BoundsSpecified.Height) != 0)
+		{
+			m_scaledCaptionHeight *= factor.Height;
+		}
+		m_iCaptionHeight = Math.Max(18, (int)Math.Round(m_scaledCaptionHeight));
+		base.ScaleControl(factor, specified);
 	}
 
 	protected override void OnPaintBackground(PaintEventArgs pevent)

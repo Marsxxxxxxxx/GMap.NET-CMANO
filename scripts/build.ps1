@@ -36,7 +36,7 @@ try {
     if ($testRun.ExitCode -ne 0) { throw 'Smoke tests failed.' }
 
     $appOutput = Join-Path $projectRoot ('src\GMap.NET.CMANO\bin\' + $Configuration + '\net48')
-    $packageName = 'GMap.NET.CMANO-2.1.7-cmano.1-preview'
+    $packageName = 'GMap.NET.CMANO-2.1.7-cmano.2-preview'
     $staging = Join-Path $projectRoot ('artifacts\package-' + $runId)
     $package = Join-Path $staging $packageName
     $dist = Join-Path $projectRoot 'dist'
@@ -47,6 +47,11 @@ try {
     foreach ($library in @('GMap.NET.Core.dll', 'GMap.NET.WindowsForms.dll')) {
         $version = [Reflection.AssemblyName]::GetAssemblyName((Join-Path $package $library)).Version
         if ($version -ne [Version]'2.1.7.0') { throw ('Incorrect packaged library: ' + $library) }
+    }
+    $packagedConfig = [xml](Get-Content -LiteralPath (Join-Path $package 'GMap.NET_CMANO.exe.config') -Raw)
+    $dpiSetting = $packagedConfig.SelectSingleNode('/configuration/System.Windows.Forms.ApplicationConfigurationSection/add[@key="DpiAwareness"]')
+    if ($null -eq $dpiSetting -or $dpiSetting.GetAttribute('value') -ne 'PerMonitorV2') {
+        throw 'The packaged application is missing its PerMonitorV2 configuration.'
     }
     foreach ($architecture in @('x86', 'x64')) {
         if (-not (Test-Path -LiteralPath (Join-Path $package ($architecture + '\SQLite.Interop.dll')))) {

@@ -6,11 +6,23 @@
 
 ## 运行
 
-1. 解压整个 `GMap.NET.CMANO-2.1.7-cmano.1-preview.zip`。
+1. 解压整个 `GMap.NET.CMANO-2.1.7-cmano.2-preview.zip`。
 2. 保留同目录下的所有 DLL，以及 `x86` / `x64` 等子目录。
 3. 启动 `GMap.NET_CMANO.exe`。需要 Windows 和 **.NET Framework 4.8**；运行程序不需要 .NET 10 SDK。
 
 当前工作目录根部的原始 1.7.5 程序保持原样。不要把新版 DLL 单独覆盖到旧 EXE 旁边；升级版应从自己的解压目录运行。
+
+## 4K 屏幕与高 DPI
+
+Preview 2 在 Windows 10 1703 及更新版本（包括 Windows 11）上启用 `PerMonitorV2`，主窗口和导出窗口按屏幕 DPI 缩放，自绘标题栏与图标同步缩放。可以保留 Windows 的 150% 等缩放比例。
+
+从 `Release/GMap.NET_CMANO.exe` 或完整解压后的运行包启动，并保留同目录的 `GMap.NET_CMANO.exe.config`。若曾在 EXE 的“属性 → 兼容性 → 更改高 DPI 设置”中启用“替代高 DPI 缩放行为”，先取消该覆盖并重新启动程序，以使用程序自己的 DPI 适配。
+
+自动验证会检查实际窗口 DPI 模式、主界面与导出窗口尺寸，以及自绘标题栏在 100% → 150% → 200% → 100% 之间缩放时是否发生重复缩放或舍入漂移。本次本机实际渲染检查使用 144 DPI（150%）；200% 为控件缩放测试，混合 DPI 多显示器拖动仍需实际确认。旧的小尺寸位图资源没有重新制作。
+
+界面清晰度与导出地图的像素分辨率分别控制。这次更新不改变导出缩图或 PGW 坐标计算规则。
+
+配置依据：[Microsoft 的 Windows Forms 高 DPI 支持说明](https://learn.microsoft.com/en-us/dotnet/desktop/winforms/high-dpi-support-in-windows-forms?view=netframeworkdesktop-4.8)。
 
 ## 这次升级包含什么
 
@@ -21,6 +33,7 @@
 - 移除使用无关 `pingtest.com` 的联网判断，避免 ICMP 被禁用时强制进入离线缓存模式。
 - 移除旧 IP 查询演示功能中硬编码的第三方密钥；该可选演示只在设置 `GMAP_IPINFODB_API_KEY` 时尝试工作，其旧服务本身尚未验证。
 - 提供离线验证、独立运行包和 GitHub Actions 构建配置。
+- Preview 2 增加高 DPI 配置、窗口与自绘面板缩放，并验证 150% 下的实际界面布局。
 
 ## 当前验证范围
 

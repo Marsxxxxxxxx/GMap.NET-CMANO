@@ -16,6 +16,10 @@ public class BasePanel : ScrollableControl, IPanel
 
 	private int m_iCaptionHeight;
 
+	private float m_scaledCaptionHeight;
+
+	private SizeF m_scaledImageSize;
+
 	private Font m_captionFont;
 
 	private Rectangle m_imageRectangle;
@@ -129,6 +133,7 @@ public class BasePanel : ScrollableControl, IPanel
 				throw new InvalidOperationException(string.Format(CultureInfo.CurrentUICulture, Resources.IDS_InvalidOperationExceptionInteger, new object[3] { value, "CaptionHeight", 18 }));
 			}
 			m_iCaptionHeight = value;
+			m_scaledCaptionHeight = value;
 			OnCaptionHeightChanged(this, EventArgs.Empty);
 		}
 	}
@@ -327,6 +332,8 @@ public class BasePanel : ScrollableControl, IPanel
 		set
 		{
 			m_imageSize = value;
+			m_scaledImageSize = value;
+			m_imageRectangle = Rectangle.Empty;
 		}
 	}
 
@@ -338,7 +345,7 @@ public class BasePanel : ScrollableControl, IPanel
 		{
 			if (m_imageRectangle == Rectangle.Empty)
 			{
-				m_imageRectangle = new Rectangle(6, CaptionHeight, m_imageSize.Width, m_imageSize.Height);
+				m_imageRectangle = new Rectangle(LogicalToDeviceUnits(CaptionSpacing), CaptionHeight, m_imageSize.Width, m_imageSize.Height);
 			}
 			return m_imageRectangle;
 		}
@@ -400,9 +407,29 @@ public class BasePanel : ScrollableControl, IPanel
 		CaptionHeight = 25;
 		PanelStyle = PanelStyle.Default;
 		m_panelColors = new PanelColors(this);
-		m_imageSize = new Size(16, 16);
+		ImageSize = new Size(16, 16);
 		m_imageRectangle = Rectangle.Empty;
 		m_toolTip = new ToolTip();
+	}
+
+	protected override void ScaleControl(SizeF factor, BoundsSpecified specified)
+	{
+		// These custom metrics are not scaled by WinForms. Retain fractions so
+		// moving between 100%, 150% and 200% does not accumulate rounding drift.
+		if ((specified & BoundsSpecified.Height) != 0)
+		{
+			m_scaledCaptionHeight *= factor.Height;
+		}
+		m_scaledImageSize = new SizeF(
+			m_scaledImageSize.Width * (((specified & BoundsSpecified.Width) != 0) ? factor.Width : 1f),
+			m_scaledImageSize.Height * (((specified & BoundsSpecified.Height) != 0) ? factor.Height : 1f));
+		m_iCaptionHeight = Math.Max(18, (int)Math.Round(m_scaledCaptionHeight));
+		m_imageSize = Size.Round(m_scaledImageSize);
+		m_imageRectangle = Rectangle.Empty;
+		RectangleExpandIcon = Rectangle.Empty;
+		RectangleCloseIcon = Rectangle.Empty;
+		base.ScaleControl(factor, specified);
+		OnCaptionHeightChanged(this, EventArgs.Empty);
 	}
 
 	protected override void OnTextChanged(EventArgs e)
@@ -689,7 +716,9 @@ public class BasePanel : ScrollableControl, IPanel
 		int num2 = imgPanelIcon.Height;
 		checked
 		{
-			Rectangle destRect = new Rectangle(left + unchecked(num / 2) - 1, iconPositionY + unchecked(num2 / 2) - 1, imgPanelIcon.Width, imgPanelIcon.Height - 1);
+			float scaleX = graphics.DpiX / 96f;
+			float scaleY = graphics.DpiY / 96f;
+			Rectangle destRect = new Rectangle(left + (int)Math.Round((num / 2 - 1) * scaleX), iconPositionY + (int)Math.Round((num2 / 2 - 1) * scaleY), Math.Max(1, (int)Math.Round(num * scaleX)), Math.Max(1, (int)Math.Round((num2 - 1) * scaleY)));
 			using ImageAttributes imageAttributes = new ImageAttributes();
 			imageAttributes.SetColorKey(Color.Magenta, Color.Magenta);
 			ColorMap colorMap = new ColorMap();

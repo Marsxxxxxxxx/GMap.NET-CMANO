@@ -3,6 +3,8 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net48</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
+    <AppConfig>../../src/GMap.NET.CMANO/app.config</AppConfig>
+    <ApplicationManifest>../../src/GMap.NET.CMANO/app.manifest</ApplicationManifest>
     <LangVersion>14.0</LangVersion>
     <AssemblyName>GMap.NET.CMANO.SmokeTests</AssemblyName>
     <PlatformTarget>AnyCPU</PlatformTarget>

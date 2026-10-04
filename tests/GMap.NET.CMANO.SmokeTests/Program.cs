@@ -44,10 +44,11 @@ internal static class Program
 
             GMaps.Instance.Mode = AccessMode.ServerOnly;
             var provider = new SyntheticProvider();
-            using var form = new MainForm(provider, Path.Combine(output, "cache"));
+            using var form = new DpiChecks.OffscreenMainForm(provider, Path.Combine(output, "cache"));
             Assert(form.MainMap.MapProvider == provider, "Injected offline map provider");
             form.CreateControl();
             Console.WriteLine("PASS main form and resources constructed");
+            DpiChecks.Verify(form, output);
 
             const int zoom = 14;
             var projection = provider.Projection;
@@ -59,10 +60,11 @@ internal static class Program
             form.MainMap.Zoom = zoom;
             form.MainMap.Position = topLeft;
 
-            using (var export = new StaticImage(form))
+            using (var export = new DpiChecks.OffscreenExportForm(form))
             {
                 Assert(GetField<CheckBox>(export, "checkBoxWorldFile").Checked,
                     "CMANO world file remains enabled by default");
+                DpiChecks.VerifyExportWindow(export, output);
                 GetField<TextBox>(export, "textBoxSaveAs").Text = Path.Combine(output, "layer.png");
                 GetField<TextBox>(export, "textBoxSizeFile").Text = "99";
                 GetField<List<GPoint>>(export, "tileArea").AddRange(projection.GetAreaTileList(area, zoom, 1));
@@ -95,8 +97,8 @@ internal static class Program
         }
     }
 
-    private static T GetField<T>(object value, string name) =>
-        (T)value.GetType().GetField(name, PrivateInstance).GetValue(value);
+    private static T GetField<T>(StaticImage value, string name) =>
+        (T)typeof(StaticImage).GetField(name, PrivateInstance).GetValue(value);
 
     private static void Assert(bool condition, string message)
     {

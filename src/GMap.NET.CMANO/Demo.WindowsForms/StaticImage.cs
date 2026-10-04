@@ -529,8 +529,8 @@ public class StaticImage : Form
 		this.btnSave.Text = "Set file";
 		this.btnSave.UseVisualStyleBackColor = true;
 		this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-		base.AutoScaleDimensions = new System.Drawing.SizeF(6f, 13f);
-		base.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+		base.AutoScaleDimensions = new System.Drawing.SizeF(96f, 96f);
+		base.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 		base.ClientSize = new System.Drawing.Size(457, 173);
 		base.Controls.Add(this.btnSave);
 		base.Controls.Add(this.textBoxSaveAs);

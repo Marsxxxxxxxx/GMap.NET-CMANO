@@ -273,7 +273,7 @@ public class Panel : BasePanel
 				DrawBorder(graphics, clientRectangle, captionRectangle, PanelColors.BorderColor, PanelColors.InnerBorderColor);
 				if (dock == DockStyle.Fill || dock == DockStyle.None || (!showExpandIcon && !showCloseIcon))
 				{
-					BasePanel.DrawImagesAndText(graphics, captionRectangle, 6, ImageRectangle, image, rightToLeft, captionFont, color, strCaptionText);
+					BasePanel.DrawImagesAndText(graphics, captionRectangle, LogicalToDeviceUnits(CaptionSpacing), ImageRectangle, image, rightToLeft, captionFont, color, strCaptionText);
 				}
 				else
 				{
@@ -282,7 +282,7 @@ public class Panel : BasePanel
 						return;
 					}
 					Image expandImage = GetExpandImage(dock, expand);
-					BasePanel.DrawImagesAndText(graphics, dock, 6, captionRectangle, clientRectangle, ImageRectangle, image, rightToLeft, showCloseIcon, m_imageClosePanel, color2, ref RectangleCloseIcon, showExpandIcon, expand, expandImage, color, ref RectangleExpandIcon, captionFont, color, PanelColors.PanelCollapsedCaptionText, strCaptionText);
+					BasePanel.DrawImagesAndText(graphics, dock, LogicalToDeviceUnits(CaptionSpacing), captionRectangle, clientRectangle, ImageRectangle, image, rightToLeft, showCloseIcon, m_imageClosePanel, color2, ref RectangleCloseIcon, showExpandIcon, expand, expandImage, color, ref RectangleExpandIcon, captionFont, color, PanelColors.PanelCollapsedCaptionText, strCaptionText);
 					if (m_imgHoverBackground == null)
 					{
 						m_imgHoverBackground = GetPanelIconBackground(graphics, ImageRectangle, PanelColors.PanelCaptionSelectedGradientBegin, PanelColors.PanelCaptionSelectedGradientEnd);

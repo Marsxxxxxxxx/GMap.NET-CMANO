@@ -325,7 +325,7 @@ public class XPanderPanel : BasePanel
 			BasePanel.RenderFlatButtonBackground(graphics, captionRectangle, xPanderPanelFlatCaptionGradientBegin, xPanderPanelFlatCaptionGradientEnd, flag);
 			DrawInnerBorders(graphics, this);
 		}
-		BasePanel.DrawImagesAndText(graphics, captionRectangle, 6, ImageRectangle, Image, RightToLeft, m_bIsClosable, ShowCloseIcon, m_imageClosePanel, foreColorCloseIcon, ref RectangleCloseIcon, ShowExpandIcon, m_imageChevron, foreColorExpandIcon, ref RectangleExpandIcon, CaptionFont, color4, Text);
+		BasePanel.DrawImagesAndText(graphics, captionRectangle, LogicalToDeviceUnits(CaptionSpacing), ImageRectangle, Image, RightToLeft, m_bIsClosable, ShowCloseIcon, m_imageClosePanel, foreColorCloseIcon, ref RectangleCloseIcon, ShowExpandIcon, m_imageChevron, foreColorExpandIcon, ref RectangleExpandIcon, CaptionFont, color4, Text);
 	}
 
 	private static void DrawBorders(Graphics graphics, XPanderPanel xpanderPanel)
