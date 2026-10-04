@@ -99,6 +99,7 @@ internal static class Program
             provider.DelayMilliseconds = 250;
             try { WorkspaceChecks.VerifyCloseCancellation(form, output); }
             finally { provider.DelayMilliseconds = 0; }
+            PrefetchChecks.Verify(provider, output, milliseconds => provider.DelayMilliseconds = milliseconds);
             Assert(provider.RequestCount > 0, "Actual tile retrieval ran");
             Console.WriteLine("PASS synthetic tile requests: " + provider.RequestCount);
             Console.WriteLine("No public map service was contacted. In-game alignment is a separate manual check.");

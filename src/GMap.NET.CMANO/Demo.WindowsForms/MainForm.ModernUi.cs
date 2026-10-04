@@ -35,7 +35,7 @@ public partial class MainForm
         MinimumSize = new Size(1040, 720);
         WindowState = FormWindowState.Normal;
         ClientSize = new Size(1440, 1000);
-        Text = "GMap.NET CMANO — 地图叠加层工作台 · Preview 6";
+        Text = "GMap.NET CMANO — 地图叠加层工作台 · Preview 7";
 
         var root = new TableLayoutPanel { Name = "workspaceRoot", Dock = DockStyle.Fill, Margin = Padding.Empty, ColumnCount = 1, RowCount = 3, BackColor = ModernTheme.Background };
         root.RowStyles.Add(new RowStyle(SizeType.Absolute, 82));
@@ -67,7 +67,7 @@ public partial class MainForm
         MainMap.MouseUp += (s, e) => UpdateSelection(true);
         MainMap.OnPositionChanged += p => UpdateWorkspaceStatus();
         MainMap.OnMapZoomChanged += UpdateWorkspaceStatus;
-        MainMap.OnMapTypeChanged += p => UpdateWorkspaceStatus();
+        MainMap.OnMapTypeChanged += p => { prefetchRangeEdited = false; UpdateWorkspaceStatus(); };
         panelMenu.TextChanged += (s, e) => tileStatus.Text = panelMenu.Text.Contains("loading") ? "地图加载中…" : "加载完成 · " + MainMap.ElapsedMilliseconds + " ms";
         routes.Routes.CollectionChanged += (s, e) => UpdateWorkspaceStatus();
         KeyDown += WorkspaceKeyDown;
@@ -86,7 +86,7 @@ public partial class MainForm
         var brand = ModernTheme.Stack();
         var name = ModernTheme.Label("GMap.NET", true); name.Font = ModernTheme.Brand;
         ModernTheme.Add(brand, name, 33);
-        ModernTheme.Add(brand, ModernTheme.Label("CMANO 地图叠加层  /  Preview 6"), 21);
+        ModernTheme.Add(brand, ModernTheme.Label("CMANO 地图叠加层  /  Preview 7"), 21);
         header.Controls.Add(brand, 1, 0);
         ModernTheme.Style(button1, "刷新地图");
         ModernTheme.Style(button13, "导出叠加层", true);
@@ -195,6 +195,7 @@ public partial class MainForm
         AddReadout(cache, "磁盘缓存", textBoxCacheSize); AddReadout(cache, "状态", textBoxCacheStatus); AddReadout(cache, "内存", textBoxMemory);
         ModernTheme.Check(checkBoxUseRouteCache, "缓存路线、地理编码与地址查询"); ModernTheme.Add(cache, checkBoxUseRouteCache, 30);
         AddButtons(cache, button10, "导入缓存", button9, "导出缓存");
+        AddPrefetchControls(cache);
         ModernTheme.Style(button11, "预下载选区地图"); ModernTheme.Add(cache, button11, 40);
         ModernTheme.Style(button2, "清理磁盘瓦片缓存"); ModernTheme.Add(cache, button2, 40);
         var map = ModernTheme.Card(stack, "地图工具");
@@ -370,6 +371,7 @@ public partial class MainForm
             areaSouth.Text = area.IsEmpty ? "" : area.Bottom.ToString("F6", CultureInfo.InvariantCulture); areaEast.Text = area.IsEmpty ? "" : area.Right.ToString("F6", CultureInfo.InvariantCulture);
         }
         button13.Enabled = !area.IsEmpty || routes.Routes.Count > 0;
+        button11.Enabled = !area.IsEmpty;
     }
     private void UpdateWorkspaceStatus()
     {
@@ -382,5 +384,6 @@ public partial class MainForm
         zoomCaption.Text = "Z " + MainMap.Zoom.ToString("0.##", CultureInfo.InvariantCulture);
         viewportSummary.Text = MainMap.SelectedArea.IsEmpty ? "定位地图后，框选需要导出的区域" : "选区已就绪  ·  点击「导出叠加层」设置输出画质";
         UpdateSelection(false);
+        UpdatePrefetchRange();
     }
 }

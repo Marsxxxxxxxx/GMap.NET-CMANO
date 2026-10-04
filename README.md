@@ -6,7 +6,7 @@
 
 ## 运行
 
-1. 解压整个 `GMap.NET.CMANO-2.1.7-cmano.6-preview.zip`。
+1. 解压整个 `GMap.NET.CMANO-2.1.7-cmano.7-preview.zip`。
 2. 保留同目录下的所有 DLL，以及 `x86` / `x64` 等子目录。
 3. 启动 `GMap.NET_CMANO.exe`。需要 Windows 和 **.NET Framework 4.8**；运行程序不需要 .NET 10 SDK。
 
@@ -21,6 +21,8 @@
 ![Preview 4 工作台](docs/images/workspace-preview4.png)
 
 Preview 5 修复圆角按钮局部刷新时的黑边，并增加普通、选中和禁用状态的四角像素验证。
+
+Preview 7 将选区预下载改为单个进度窗口连续处理多个缩放等级，取消逐级开始确认和完成提示。在「工具 → 本地缓存」中可调整预下载结束等级，点击即开始；取消会停止整个范围。
 
 ## 代理与连接设置
 

@@ -1870,37 +1870,7 @@ public partial class MainForm : Form
 
 	private void button11_Click(object sender, EventArgs e)
 	{
-		RectLatLng selectedArea = MainMap.SelectedArea;
-		checked
-		{
-			if (!selectedArea.IsEmpty)
-			{
-				for (int i = (int)MainMap.Zoom; i <= MainMap.MaxZoom; i++)
-				{
-					switch (MessageBox.Show("Ready ripp at Zoom = " + i + " ?", "GMap.NET", MessageBoxButtons.YesNoCancel))
-					{
-					case DialogResult.Yes:
-					{
-						using (TilePrefetcher tilePrefetcher = new TilePrefetcher())
-						{
-							tilePrefetcher.Overlay = objects;
-							tilePrefetcher.Shuffle = MainMap.Manager.Mode != AccessMode.CacheOnly;
-							tilePrefetcher.Owner = this;
-							tilePrefetcher.ShowCompleteMessage = true;
-							tilePrefetcher.Start(selectedArea, i, MainMap.MapProvider, (MainMap.Manager.Mode != AccessMode.CacheOnly) ? 100 : 0, (MainMap.Manager.Mode != AccessMode.CacheOnly) ? 1 : 0);
-						}
-						break;
-					}
-					case DialogResult.Cancel:
-						return;
-					}
-				}
-			}
-			else
-			{
-				MessageBox.Show("Select map area holding ALT", "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-			}
-		}
+		StartAreaPrefetch();
 	}
 
 	private void button12_Click(object sender, EventArgs e)
@@ -3659,7 +3629,7 @@ public partial class MainForm : Form
 		this.MinimumSize = new System.Drawing.Size(554, 106);
 		base.Name = "MainForm";
 		base.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-		this.Text = "GMap.NET CMANO - 2.1.7 Preview 6";
+		this.Text = "GMap.NET CMANO - 2.1.7 Preview 7";
 		base.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 		base.Load += new System.EventHandler(this.MainForm_Load);
 		base.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MainForm_KeyPress);

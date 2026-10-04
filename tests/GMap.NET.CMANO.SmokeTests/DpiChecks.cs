@@ -93,8 +93,21 @@ internal static class DpiChecks
     internal sealed class OffscreenMainForm : MainForm
     {
         internal OffscreenMainForm(GMap.NET.MapProviders.GMapProvider provider, string cache, string networkPath = null) : base(provider, cache, networkPath) { }
+        internal AreaPrefetchDialog LastPrefetch;
+        internal override AreaPrefetchDialog CreatePrefetchDialog(GMap.NET.RectLatLng area, int first, int last) =>
+            LastPrefetch = new OffscreenPrefetchDialog(area, first, last, MainMap.MapProvider, MainMap.Manager.Mode == GMap.NET.AccessMode.CacheOnly);
         protected override bool ShowWithoutActivation => true;
         protected override void OnLoad(EventArgs e) { }
     }
+    private sealed class OffscreenPrefetchDialog : AreaPrefetchDialog
+    {
+        internal OffscreenPrefetchDialog(GMap.NET.RectLatLng area, int first, int last, GMap.NET.MapProviders.GMapProvider provider, bool cacheOnly)
+            : base(area, first, last, provider, cacheOnly, 0)
+        {
+            StartPosition = FormStartPosition.Manual; Location = new Point(-20000, -20000);
+        }
+        protected override bool ShowWithoutActivation => true;
+    }
+
     private static void Assert(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 }
