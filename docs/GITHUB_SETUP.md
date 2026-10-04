@@ -2,7 +2,7 @@
 
 现有流程：本地修改 → Git 提交并推送 → GitHub Actions 编译和测试 → 下载运行包 → 在 Releases 发布经过验证的版本。
 
-本地首次准备时已初始化 `main` 分支，尚无提交和远程仓库。自动构建文件为 [build.yml](../.github/workflows/build.yml)，实际构建入口为 [build.ps1](../scripts/build.ps1)。它们已经放在源码中，首次上传会一起进入 GitHub。
+自动构建文件为 [build.yml](../.github/workflows/build.yml)，实际构建入口为 [build.ps1](../scripts/build.ps1)。它们与源码一起保存在 Git 仓库中。如果已经通过 GitHub Desktop 发布了仓库，可以直接从第 4 节查看自动构建，并按第 6 节继续更新，无需重复初始化或添加远程仓库。
 
 ## 1. 创建空仓库
 
@@ -21,8 +21,8 @@
 本机目录曾出现属主与当前 Windows 账号不一致的情况。下面的 `$projectGitArgs` 只对每次命令信任这个已知项目目录，不修改全局信任列表。
 
 ```powershell
-Set-Location 'D:\Toolbox\GMap.NET.CMANO'
-$projectGitArgs = @('-c', 'safe.directory=D:/Toolbox/GMap.NET.CMANO')
+Set-Location 'C:\Users\Levitate\Documents\GitHub\GMap.NET-CMANO'
+$projectGitArgs = @('-c', 'safe.directory=C:/Users/Levitate/Documents/GitHub/GMap.NET-CMANO')
 
 # 将两项示例替换成你的真实提交者信息后执行。
 git @projectGitArgs config --local user.name '你的显示名称'
@@ -95,8 +95,8 @@ Actions 产物按仓库设置的期限保留；适合长期按版本管理的运
 开始修改前，可在工作目录干净的情况下同步远程修改：
 
 ```powershell
-Set-Location 'D:\Toolbox\GMap.NET.CMANO'
-$projectGitArgs = @('-c', 'safe.directory=D:/Toolbox/GMap.NET.CMANO')
+Set-Location 'C:\Users\Levitate\Documents\GitHub\GMap.NET-CMANO'
+$projectGitArgs = @('-c', 'safe.directory=C:/Users/Levitate/Documents/GitHub/GMap.NET-CMANO')
 git @projectGitArgs pull --ff-only
 ```
 
