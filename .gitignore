@@ -1,0 +1,20 @@
+.tools/
+artifacts/
+dist/
+/Release/
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+*.gmdb
+*.gmdb-*
+*.log
+/old files/
+/GMap.NET_CMANO.exe
+/GMap.NET_CMANO.exe.config
+/GMap.NET.Core.dll
+/GMap.NET.WindowsForms.dll
+/GMap.NET.WindowsForms.xml
+Thumbs.db
+.DS_Store

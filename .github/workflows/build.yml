@@ -1,0 +1,29 @@
+name: Build and verify Windows package
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-dotnet@v6.0.0
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build, run offline smoke tests, and package
+        shell: pwsh
+        run: ./scripts/build.ps1
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: GMap.NET.CMANO-2.1.7-preview
+          path: |
+            dist/*.zip
+            dist/*.sha256
+          if-no-files-found: error

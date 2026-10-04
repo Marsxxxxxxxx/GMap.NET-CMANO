@@ -1,0 +1,73 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>GMap.NET_CMANO</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <OutputType>WinExe</OutputType>
+    <UseWindowsForms>True</UseWindowsForms>
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>14.0</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Demo.WindowsForms.leafletjs.dist.images.layers.png" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.images.locate.png" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.images.locate_active.png" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.images.marker-icon-2x.png" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.images.marker-icon.png" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.images.marker-shadow.png" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.images.locate.svg" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.images.spinner.gif" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.leaflet-ie.css" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.leaflet.css" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.locate-ie.css" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.locate.css" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.mobile.css" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.leaflet.js" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.locate.js" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.proj4js-compressed.js" />
+    <None Remove="Demo.WindowsForms.leafletjs.dist.proj4leaflet.js" />
+    <None Remove="Demo.WindowsForms.leafletjs.gmap.html" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.images.layers.png" LogicalName="Demo.WindowsForms.leafletjs.dist.images.layers.png" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.images.locate.png" LogicalName="Demo.WindowsForms.leafletjs.dist.images.locate.png" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.images.locate_active.png" LogicalName="Demo.WindowsForms.leafletjs.dist.images.locate_active.png" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.images.marker-icon-2x.png" LogicalName="Demo.WindowsForms.leafletjs.dist.images.marker-icon@2x.png" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.images.marker-icon.png" LogicalName="Demo.WindowsForms.leafletjs.dist.images.marker-icon.png" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.images.marker-shadow.png" LogicalName="Demo.WindowsForms.leafletjs.dist.images.marker-shadow.png" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.images.locate.svg" LogicalName="Demo.WindowsForms.leafletjs.dist.images.locate.svg" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.images.spinner.gif" LogicalName="Demo.WindowsForms.leafletjs.dist.images.spinner.gif" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.leaflet-ie.css" LogicalName="Demo.WindowsForms.leafletjs.dist.leaflet-ie.css" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.leaflet.css" LogicalName="Demo.WindowsForms.leafletjs.dist.leaflet.css" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.locate-ie.css" LogicalName="Demo.WindowsForms.leafletjs.dist.locate-ie.css" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.locate.css" LogicalName="Demo.WindowsForms.leafletjs.dist.locate.css" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.mobile.css" LogicalName="Demo.WindowsForms.leafletjs.dist.mobile.css" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.leaflet.js" LogicalName="Demo.WindowsForms.leafletjs.dist.leaflet.js" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.locate.js" LogicalName="Demo.WindowsForms.leafletjs.dist.locate.js" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.proj4js-compressed.js" LogicalName="Demo.WindowsForms.leafletjs.dist.proj4js-compressed.js" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.dist.proj4leaflet.js" LogicalName="Demo.WindowsForms.leafletjs.dist.proj4leaflet.js" />
+    <EmbeddedResource Include="Demo.WindowsForms.leafletjs.gmap.html" LogicalName="Demo.WindowsForms.leafletjs.gmap.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="GMap.NET.Core" Version="[2.1.7]" />
+    <PackageReference Include="GMap.NET.WinForms" Version="[2.1.7]" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="all" />
+    <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
+    <Reference Include="System.Xml" />
+
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+  </ItemGroup>
+</Project>
