@@ -53,6 +53,7 @@ internal static class Program
             form.CreateControl();
             Console.WriteLine("PASS main form and resources constructed");
             DpiChecks.Verify(form, output);
+            ButtonPaintChecks.Verify(form, output);
             WorkspaceChecks.Verify(form, output);
 
             const int zoom = 14;

@@ -126,6 +126,10 @@ internal sealed class WorkspaceButton : Button
     protected override void OnLostFocus(EventArgs e) { Invalidate(); base.OnLostFocus(e); }
     protected override void OnPaint(PaintEventArgs e)
     {
+        // The Button paint adapter can skip background erasure during a partial repaint.
+        // Paint the entire clipped client area before drawing the rounded surface.
+        using (var background = new SolidBrush(Parent?.BackColor ?? ModernTheme.Background))
+            e.Graphics.FillRectangle(background, ClientRectangle);
         float scale = DeviceDpi / 96f;
         var bounds = new RectangleF(0.5f, 0.5f, Width - 1, Height - 1);
         float radius = Math.Min(7 * scale, Math.Min(Width, Height) / 2f);

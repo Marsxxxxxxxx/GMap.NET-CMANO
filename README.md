@@ -6,19 +6,21 @@
 
 ## 运行
 
-1. 解压整个 `GMap.NET.CMANO-2.1.7-cmano.4-preview.zip`。
+1. 解压整个 `GMap.NET.CMANO-2.1.7-cmano.5-preview.zip`。
 2. 保留同目录下的所有 DLL，以及 `x86` / `x64` 等子目录。
 3. 启动 `GMap.NET_CMANO.exe`。需要 Windows 和 **.NET Framework 4.8**；运行程序不需要 .NET 10 SDK。
 
 当前工作目录根部的原始 1.7.5 程序保持原样。不要把新版 DLL 单独覆盖到旧 EXE 旁边；升级版应从自己的解压目录运行。
 
-## 新界面（Preview 4）
+## 新界面（Preview 4 起）
 
 主界面采用顶部操作栏、左侧设置页面和大地图工作区。常用流程按「选择地图 → 定位 → 确定范围 → 导出」组织，支持十进制度边界、平移/框选切换、当前视野选区和原始像素尺寸预览。标记、路线、缓存与旧工具保留在独立页面中。
 
 使用方法见 [新版界面说明](docs/UI_GUIDE.md)。下图为 150% 缩放下的真实窗口，地图使用离线测试网格。
 
 ![Preview 4 工作台](docs/images/workspace-preview4.png)
+
+Preview 5 修复圆角按钮局部刷新时的黑边，并增加普通、选中和禁用状态的四角像素验证。
 
 ## 缓存位置
 

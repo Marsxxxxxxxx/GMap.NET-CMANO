@@ -3658,7 +3658,7 @@ public partial class MainForm : Form
 		this.MinimumSize = new System.Drawing.Size(554, 106);
 		base.Name = "MainForm";
 		base.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-		this.Text = "GMap.NET CMANO - 2.1.7 Preview 4";
+		this.Text = "GMap.NET CMANO - 2.1.7 Preview 5";
 		base.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 		base.Load += new System.EventHandler(this.MainForm_Load);
 		base.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MainForm_KeyPress);

@@ -35,7 +35,7 @@ public partial class MainForm
         MinimumSize = new Size(1040, 720);
         WindowState = FormWindowState.Normal;
         ClientSize = new Size(1440, 1000);
-        Text = "GMap.NET CMANO — 地图叠加层工作台 · Preview 4";
+        Text = "GMap.NET CMANO — 地图叠加层工作台 · Preview 5";
 
         var root = new TableLayoutPanel { Name = "workspaceRoot", Dock = DockStyle.Fill, Margin = Padding.Empty, ColumnCount = 1, RowCount = 3, BackColor = ModernTheme.Background };
         root.RowStyles.Add(new RowStyle(SizeType.Absolute, 82));
@@ -86,7 +86,7 @@ public partial class MainForm
         var brand = ModernTheme.Stack();
         var name = ModernTheme.Label("GMap.NET", true); name.Font = ModernTheme.Brand;
         ModernTheme.Add(brand, name, 33);
-        ModernTheme.Add(brand, ModernTheme.Label("CMANO 地图叠加层  /  Preview 4"), 21);
+        ModernTheme.Add(brand, ModernTheme.Label("CMANO 地图叠加层  /  Preview 5"), 21);
         header.Controls.Add(brand, 1, 0);
         ModernTheme.Style(button1, "刷新地图");
         ModernTheme.Style(button13, "导出叠加层", true);
