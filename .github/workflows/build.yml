@@ -22,7 +22,7 @@ jobs:
         run: ./scripts/build.ps1
       - uses: actions/upload-artifact@v7.0.1
         with:
-          name: GMap.NET.CMANO-2.1.7-cmano.5-preview
+          name: GMap.NET.CMANO-2.1.7-cmano.6-preview
           path: |
             dist/*.zip
             dist/*.sha256

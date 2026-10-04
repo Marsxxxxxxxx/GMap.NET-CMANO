@@ -35,7 +35,7 @@ public partial class MainForm
         MinimumSize = new Size(1040, 720);
         WindowState = FormWindowState.Normal;
         ClientSize = new Size(1440, 1000);
-        Text = "GMap.NET CMANO — 地图叠加层工作台 · Preview 5";
+        Text = "GMap.NET CMANO — 地图叠加层工作台 · Preview 6";
 
         var root = new TableLayoutPanel { Name = "workspaceRoot", Dock = DockStyle.Fill, Margin = Padding.Empty, ColumnCount = 1, RowCount = 3, BackColor = ModernTheme.Background };
         root.RowStyles.Add(new RowStyle(SizeType.Absolute, 82));
@@ -86,7 +86,7 @@ public partial class MainForm
         var brand = ModernTheme.Stack();
         var name = ModernTheme.Label("GMap.NET", true); name.Font = ModernTheme.Brand;
         ModernTheme.Add(brand, name, 33);
-        ModernTheme.Add(brand, ModernTheme.Label("CMANO 地图叠加层  /  Preview 5"), 21);
+        ModernTheme.Add(brand, ModernTheme.Label("CMANO 地图叠加层  /  Preview 6"), 21);
         header.Controls.Add(brand, 1, 0);
         ModernTheme.Style(button1, "刷新地图");
         ModernTheme.Style(button13, "导出叠加层", true);
@@ -134,6 +134,7 @@ public partial class MainForm
         ModernTheme.Input(comboBoxMode); comboBoxMode.FormattingEnabled = true;
         comboBoxMode.Format += (s, e) => { if (e.ListItem is AccessMode mode) e.Value = mode == AccessMode.CacheOnly ? "仅本地缓存" : mode == AccessMode.ServerOnly ? "仅在线地图" : "在线地图 + 本地缓存"; };
         ModernTheme.Add(source, comboBoxMode, 34);
+        AddNetworkSettings(source);
 
         var location = ModernTheme.Card(stack, "02   定位地图");
         ModernTheme.Add(location, ModernTheme.Columns(ModernTheme.Label("纬度  /  Latitude"), ModernTheme.Label("经度  /  Longitude")), 24);

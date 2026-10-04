@@ -67,6 +67,8 @@
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Security" />
 
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />

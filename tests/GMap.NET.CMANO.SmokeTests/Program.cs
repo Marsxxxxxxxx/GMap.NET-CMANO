@@ -43,10 +43,12 @@ internal static class Program
                 Console.WriteLine("PASS native SQLite: " + command.ExecuteScalar());
             }
 
+            NetworkChecks.VerifySettings(output);
             GMaps.Instance.Mode = AccessMode.ServerOnly;
             var provider = new SyntheticProvider();
             CacheChecks.VerifyDefault(provider, output);
-            using var form = new DpiChecks.OffscreenMainForm(provider, Path.Combine(output, "cache override"));
+            string networkPath = Path.Combine(output, "main settings", "network.xml");
+            using var form = new DpiChecks.OffscreenMainForm(provider, Path.Combine(output, "cache override"), networkPath);
             Assert(form.MainMap.MapProvider == provider, "Injected offline map provider");
             CacheChecks.VerifyPaths(form, Path.Combine(output, "cache override"));
             Console.WriteLine("PASS explicit cache override retained");
@@ -54,6 +56,7 @@ internal static class Program
             Console.WriteLine("PASS main form and resources constructed");
             DpiChecks.Verify(form, output);
             ButtonPaintChecks.Verify(form, output);
+            NetworkChecks.VerifyDialog(form, output, networkPath);
             WorkspaceChecks.Verify(form, output);
 
             const int zoom = 14;

@@ -92,7 +92,7 @@ internal static class DpiChecks
     }
     internal sealed class OffscreenMainForm : MainForm
     {
-        internal OffscreenMainForm(GMap.NET.MapProviders.GMapProvider provider, string cache) : base(provider, cache) { }
+        internal OffscreenMainForm(GMap.NET.MapProviders.GMapProvider provider, string cache, string networkPath = null) : base(provider, cache, networkPath) { }
         protected override bool ShowWithoutActivation => true;
         protected override void OnLoad(EventArgs e) { }
     }

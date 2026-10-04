@@ -36,12 +36,12 @@ try {
     if ($testRun.ExitCode -ne 0) { throw 'Smoke tests failed.' }
 
     $appOutput = Join-Path $projectRoot ('src\GMap.NET.CMANO\bin\' + $Configuration + '\net48')
-    $packageName = 'GMap.NET.CMANO-2.1.7-cmano.5-preview'
+    $packageName = 'GMap.NET.CMANO-2.1.7-cmano.6-preview'
     $staging = Join-Path $projectRoot ('artifacts\package-' + $runId)
     $package = Join-Path $staging $packageName
     $dist = Join-Path $projectRoot 'dist'
     New-Item -ItemType Directory -Path $package, $dist -Force | Out-Null
-    Get-ChildItem -LiteralPath $appOutput | Where-Object { $_.Extension -ne '.pdb' -and $_.Name -ne 'cache' } | Copy-Item -Destination $package -Recurse
+    Get-ChildItem -LiteralPath $appOutput | Where-Object { $_.Extension -ne '.pdb' -and $_.Name -notin @('cache', 'settings') } | Copy-Item -Destination $package -Recurse
     Copy-Item -LiteralPath (Join-Path $projectRoot 'README.md'), (Join-Path $projectRoot 'THIRD_PARTY_NOTICES.md') -Destination $package
     Copy-Item -LiteralPath (Join-Path $projectRoot 'licenses'), (Join-Path $projectRoot 'docs') -Destination $package -Recurse
     foreach ($library in @('GMap.NET.Core.dll', 'GMap.NET.WindowsForms.dll')) {
@@ -59,8 +59,22 @@ try {
         }
     }
     $release = Join-Path $projectRoot 'Release'
+    $releaseExecutable = Join-Path $release 'GMap.NET_CMANO.exe'
+    $runningRelease = Get-Process -Name 'GMap.NET_CMANO' -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $releaseExecutable }
+    if ($runningRelease) {
+        $release = Join-Path $release $packageName
+        Write-Output ('The current app is running; the new package will be placed in: ' + $release)
+    }
     New-Item -ItemType Directory -Path $release -Force | Out-Null
-    Get-ChildItem -LiteralPath $package | Copy-Item -Destination $release -Recurse -Force
+    # Do not rewrite unchanged files, especially native DLLs loaded by a running app.
+    foreach ($packageFile in Get-ChildItem -LiteralPath $package -Recurse -File) {
+        $relativePath = $packageFile.FullName.Substring($package.Length + 1)
+        $destination = Join-Path $release $relativePath
+        if ((Test-Path -LiteralPath $destination) -and
+            (Get-FileHash -LiteralPath $packageFile.FullName).Hash -eq (Get-FileHash -LiteralPath $destination).Hash) { continue }
+        New-Item -ItemType Directory -Path (Split-Path -Parent $destination) -Force | Out-Null
+        Copy-Item -LiteralPath $packageFile.FullName -Destination $destination -Force
+    }
     Write-Output ('Executable: ' + (Join-Path $release 'GMap.NET_CMANO.exe'))
     $archive = Join-Path $dist ($packageName + '.zip')
     Compress-Archive -LiteralPath $package -DestinationPath $archive -Force

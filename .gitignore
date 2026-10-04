@@ -1,6 +1,8 @@
 .tools/
 artifacts/
 **/cache/
+**/settings/network.xml
+**/settings/network.xml.*.tmp
 dist/
 /Release/
 **/bin/
