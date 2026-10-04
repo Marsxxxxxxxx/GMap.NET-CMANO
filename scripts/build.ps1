@@ -36,7 +36,7 @@ try {
     if ($testRun.ExitCode -ne 0) { throw 'Smoke tests failed.' }
 
     $appOutput = Join-Path $projectRoot ('src\GMap.NET.CMANO\bin\' + $Configuration + '\net48')
-    $packageName = 'GMap.NET.CMANO-2.1.7-cmano.3-preview'
+    $packageName = 'GMap.NET.CMANO-2.1.7-cmano.4-preview'
     $staging = Join-Path $projectRoot ('artifacts\package-' + $runId)
     $package = Join-Path $staging $packageName
     $dist = Join-Path $projectRoot 'dist'

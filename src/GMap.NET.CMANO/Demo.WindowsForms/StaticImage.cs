@@ -14,7 +14,7 @@ using GMap.NET.WindowsForms;
 
 namespace Demo.WindowsForms;
 
-public class StaticImage : Form
+public partial class StaticImage : Form
 {
 	private MainForm Main;
 
@@ -56,10 +56,12 @@ public class StaticImage : Form
 
 	public StaticImage(MainForm main)
 	{
-		InitializeComponent();
 		Main = main;
+		InitializeComponent();
 		numericUpDown1.Maximum = Main.MainMap.MaxZoom;
 		numericUpDown1.Minimum = Main.MainMap.MinZoom;
+		numericUpDown1.Value = Math.Max(numericUpDown1.Minimum, Math.Min(numericUpDown1.Maximum, (decimal)Math.Round(Main.MainMap.Zoom)));
+		UpdateExportPreview();
 		bg.WorkerReportsProgress = true;
 		bg.WorkerSupportsCancellation = true;
 		bg.DoWork += bg_DoWork;
@@ -73,43 +75,51 @@ public class StaticImage : Form
 		{
 			if (e.Error != null)
 			{
-				MessageBox.Show("Error:" + e.Error.ToString(), "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+				exportStatus.Text = "导出失败：" + e.Error.Message;
 			}
 			else
 			{
 				_ = e.Result;
 			}
 		}
-		Text = "Static Map maker";
+		Text = "导出地图叠加层 — GMap.NET CMANO";
 		progressBar1.Value = 0;
 		button1.Enabled = true;
-		numericUpDown1.Enabled = true;
+		SetExportBusy(false);
+		UpdateExportPreview();
+		exportStatus.Text = e.Cancelled ? "导出已取消" : e.Error != null ? "导出失败：" + e.Error.Message : "导出完成 · 文件已保存到指定目录";
+		progressBar1.Value = e.Cancelled || e.Error != null ? 0 : 100;
+		Main.MainMap.HoldInvalidation = false;
 		Main.MainMap.Refresh();
+		if (closeAfterExport) Close();
 	}
 
 	private void bg_ProgressChanged(object sender, ProgressChangedEventArgs e)
 	{
+		if (!bg.IsBusy) return;
 		progressBar1.Value = e.ProgressPercentage;
 		GPoint gPoint = (GPoint)e.UserState;
-		Text = string.Concat("Static Map maker: Downloading[", gPoint, "]: ", tileArea.IndexOf(gPoint), " of ", tileArea.Count);
+		exportStatus.Text = "正在下载地图瓦片  ·  " + e.ProgressPercentage + "%";
 	}
 
 	private void bg_DoWork(object sender, DoWorkEventArgs e)
 	{
 		MapInfo mapInfo = (MapInfo)e.Argument;
+		string outputPath = mapInfo.OutputFileName ?? textBoxSaveAs.Text;
+		string sizeLimitText = mapInfo.SizeLimitMegabytes?.ToString(CultureInfo.InvariantCulture) ?? textBoxSizeFile.Text;
 		if (mapInfo.Area.IsEmpty)
 		{
 			return;
 		}
 		string text = string.Concat(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.DirectorySeparatorChar.ToString(), "GMap at zoom ", mapInfo.Zoom, " - ", mapInfo.Type, "-", DateTime.Now.Ticks, ".png");
-		if (!string.IsNullOrEmpty(textBoxSaveAs.Text))
+		if (!string.IsNullOrEmpty(outputPath))
 		{
-			text = Path.Combine(Path.GetDirectoryName(textBoxSaveAs.Text), Path.GetFileName(text));
+			text = Path.Combine(Path.GetDirectoryName(outputPath), Path.GetFileName(text));
 		}
 		string text2 = Path.Combine(Path.GetDirectoryName(text), "layer.png");
-		if (!string.IsNullOrEmpty(textBoxSaveAs.Text))
+		if (!string.IsNullOrEmpty(outputPath))
 		{
-			text2 = textBoxSaveAs.Text;
+			text2 = outputPath;
 		}
 		e.Result = text;
 		GPoint gPoint = mapInfo.Type.Projection.FromLatLngToPixel(mapInfo.Area.LocationTopLeft, mapInfo.Zoom);
@@ -278,7 +288,7 @@ public class StaticImage : Form
 					try
 					{
 						image = bitmap;
-						if (long.TryParse(textBoxSizeFile.Text, out var result2))
+						if (long.TryParse(sizeLimitText, out var result2))
 						{
 							long length = new FileInfo(text).Length;
 							if (length > 0 && length / 1024 / 1024 > result2)
@@ -304,12 +314,12 @@ public class StaticImage : Form
 						}
 						else
 						{
-							MessageBox.Show("Invalide size - no shrinking.", "GMap.NET - Demo.WindowsForms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+							throw new InvalidOperationException("文件大小上限无效。");
 						}
 					}
 					catch (Exception ex)
 					{
-						MessageBox.Show(ex.ToString(), "GMap.NET - Demo.WindowsForms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+						throw new IOException("无法写入输出文件：" + ex.Message, ex);
 					}
 					finally
 					{
@@ -353,6 +363,8 @@ public class StaticImage : Form
 
 	private void button1_Click(object sender, EventArgs e)
 	{
+		UpdateExportPreview();
+		if (!button1.Enabled) return;
 		RectLatLng? rectLatLng = null;
 		if (checkBoxRoutes.Checked)
 		{
@@ -382,9 +394,9 @@ public class StaticImage : Form
 			}
 			numericUpDown1.Enabled = false;
 			progressBar1.Value = 0;
-			button1.Enabled = false;
+			SetExportBusy(true);
 			Main.MainMap.HoldInvalidation = true;
-			bg.RunWorkerAsync(new MapInfo(rectLatLng.Value, (int)numericUpDown1.Value, Main.MainMap.MapProvider, checkBoxWorldFile.Checked, checkBoxKMZ.Checked));
+			bg.RunWorkerAsync(new MapInfo(rectLatLng.Value, (int)numericUpDown1.Value, Main.MainMap.MapProvider, checkBoxWorldFile.Checked, checkBoxKMZ.Checked, textBoxSaveAs.Text, long.Parse(textBoxSizeFile.Text, CultureInfo.InvariantCulture)));
 		}
 	}
 
@@ -393,7 +405,9 @@ public class StaticImage : Form
 		if (bg.IsBusy)
 		{
 			bg.CancelAsync();
+			exportStatus.Text = "正在取消导出，请稍候…";
 		}
+		else Close();
 	}
 
 	private void btnSave_Click(object sender, EventArgs e)
@@ -410,6 +424,7 @@ public class StaticImage : Form
 		{
 			components.Dispose();
 		}
+		if (disposing) DisposeModernExport();
 		base.Dispose(disposing);
 	}
 
@@ -550,8 +565,9 @@ public class StaticImage : Form
 		base.Name = "StaticImage";
 		base.Padding = new System.Windows.Forms.Padding(4);
 		base.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-		this.Text = "Static Map maker";
+		this.Text = "导出地图叠加层 — GMap.NET CMANO";
 		((System.ComponentModel.ISupportInitialize)this.numericUpDown1).EndInit();
+		InitializeModernExport();
 		base.ResumeLayout(false);
 		base.PerformLayout();
 	}

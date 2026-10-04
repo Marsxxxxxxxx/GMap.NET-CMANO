@@ -31,6 +31,7 @@ internal static class Program
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.ThrowException);
+            Control.CheckForIllegalCrossThreadCalls = true;
 
             AssertVersion(typeof(GMaps).Assembly, "GMap.NET.Core");
             AssertVersion(typeof(GMapControl).Assembly, "GMap.NET.WindowsForms");
@@ -52,6 +53,7 @@ internal static class Program
             form.CreateControl();
             Console.WriteLine("PASS main form and resources constructed");
             DpiChecks.Verify(form, output);
+            WorkspaceChecks.Verify(form, output);
 
             const int zoom = 14;
             var projection = provider.Projection;
@@ -68,12 +70,14 @@ internal static class Program
                 Assert(GetField<CheckBox>(export, "checkBoxWorldFile").Checked,
                     "CMANO world file remains enabled by default");
                 DpiChecks.VerifyExportWindow(export, output);
+                WorkspaceChecks.VerifyExport(export, output);
                 GetField<TextBox>(export, "textBoxSaveAs").Text = Path.Combine(output, "layer.png");
                 GetField<TextBox>(export, "textBoxSizeFile").Text = "99";
                 GetField<List<GPoint>>(export, "tileArea").AddRange(projection.GetAreaTileList(area, zoom, 1));
                 var work = new DoWorkEventArgs(new MapInfo(area, zoom, provider, true, false));
                 typeof(StaticImage).GetMethod("bg_DoWork", PrivateInstance).Invoke(export, new object[] { null, work });
                 Assert(!work.Cancel, "Export was not cancelled");
+                WorkspaceChecks.VerifyAsyncExport(export, form, output);
             }
 
             using (var bitmap = new Bitmap(Path.Combine(output, "layer.png")))
@@ -88,6 +92,9 @@ internal static class Program
                 Assert(Math.Abs(coefficients[3] * bitmap.Height + area.HeightLat) < 1e-8, "Unscaled latitude extent");
                 Console.WriteLine("PASS actual exporter: PNG 513x387 and matching PGW");
             }
+            provider.DelayMilliseconds = 250;
+            try { WorkspaceChecks.VerifyCloseCancellation(form, output); }
+            finally { provider.DelayMilliseconds = 0; }
             Assert(provider.RequestCount > 0, "Actual tile retrieval ran");
             Console.WriteLine("PASS synthetic tile requests: " + provider.RequestCount);
             Console.WriteLine("No public map service was contacted. In-game alignment is a separate manual check.");
@@ -118,6 +125,7 @@ internal static class Program
     private sealed class SyntheticProvider : GMapProvider
     {
         public int RequestCount;
+        public volatile int DelayMilliseconds;
         public override Guid Id => new Guid("f61138ba-9432-4fd4-bb1a-a570c62bf405");
         public override string Name => "Local smoke-test tiles";
         public override PureProjection Projection => MercatorProjection.Instance;
@@ -126,12 +134,15 @@ internal static class Program
         public override PureImage GetTileImage(GPoint position, int zoom)
         {
             Interlocked.Increment(ref RequestCount);
+            if (DelayMilliseconds > 0) Thread.Sleep(DelayMilliseconds);
             var bitmap = new Bitmap(256, 256, PixelFormat.Format32bppArgb);
             using (var graphics = Graphics.FromImage(bitmap))
             {
-                graphics.Clear(Color.FromArgb(255, (int)(position.X % 128) + 80, (int)(position.Y % 128) + 80, 120));
-                graphics.DrawLine(Pens.White, 0, 0, 255, 255);
-                graphics.DrawLine(Pens.Black, 0, 255, 255, 0);
+                graphics.Clear(Color.FromArgb(230, 238, 242));
+                using var grid = new Pen(Color.FromArgb(208, 221, 229));
+                for (int i = 0; i < 256; i += 64) { graphics.DrawLine(grid, i, 0, i, 255); graphics.DrawLine(grid, 0, i, 255, i); }
+                using var label = new Font("Segoe UI", 9);
+                graphics.DrawString("OFFLINE PREVIEW", label, Brushes.SlateGray, 12, 12);
             }
             var data = new MemoryStream();
             bitmap.Save(data, ImageFormat.Png);

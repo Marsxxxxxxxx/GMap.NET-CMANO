@@ -67,7 +67,7 @@ git @projectGitArgs push -u origin main
 2. 编译 .NET Framework 4.8 程序。
 3. 离线验证地图程序集版本、界面资源、SQLite 与 PNG/PGW 导出。
 4. 生成包含 EXE、DLL 和原生依赖的 ZIP，以及 SHA-256 校验文件。
-5. 上传名为 `GMap.NET.CMANO-2.1.7-cmano.3-preview` 的构建产物。
+5. 上传名为 `GMap.NET.CMANO-2.1.7-cmano.4-preview` 的构建产物。
 
 进入仓库 **Actions → Build and verify Windows package → 某次运行记录**。成功后在 **Artifacts** 中下载产物。下载的外层归档内包含运行包 ZIP 和校验文件；再将运行包完整解压即可使用。
 
@@ -81,8 +81,8 @@ git @projectGitArgs push -u origin main
 
 建议先下载一次绿色成功运行的产物，确认真实地图和游戏导入结果。然后进入仓库 **Releases → Draft a new release**：
 
-1. 选择对应的提交创建标签，例如 `v2.1.7-cmano.3-preview`。如果选 `main`，先确认它仍指向生成该运行包的提交；之后不要移动已经发布的标签。
-2. 标题填写 `GMap.NET CMANO 2.1.7 — Preview 3`，说明这次升级内容、验证范围和已知限制。
+1. 选择对应的提交创建标签，例如 `v2.1.7-cmano.4-preview`。如果选 `main`，先确认它仍指向生成该运行包的提交；之后不要移动已经发布的标签。
+2. 标题填写 `GMap.NET CMANO 2.1.7 — Preview 4`，说明这次升级内容、验证范围和已知限制。
 3. 将构建产物中的运行包 ZIP 及 `.sha256` 文件上传为附件。
 4. 本版勾选 **Set as a pre-release**，检查附件后发布。
 
@@ -113,7 +113,7 @@ git @projectGitArgs push
 
 本地构建失败时先修复再继续。推送会再次触发 Actions；等该次运行成功并验证地图导出效果后，再发布一个新版本。
 
-当前应用维护版本和 GMap.NET 库版本是分别管理的。例如后续可发布 `2.1.7-cmano.4-preview`，同时继续使用 GMap.NET 2.1.7。发新版本时同步修改 `Properties/AssemblyInfo.cs` 中的应用版本、构建脚本的 `$packageName`、工作流的产物名称及 `CHANGELOG.md`；Release 标签与运行包对应。
+当前应用维护版本和 GMap.NET 库版本是分别管理的。例如后续可发布 `2.1.7-cmano.5-preview`，同时继续使用 GMap.NET 2.1.7。发新版本时同步修改 `Properties/AssemblyInfo.cs` 中的应用版本、构建脚本的 `$packageName`、工作流的产物名称及 `CHANGELOG.md`；Release 标签与运行包对应。
 
 ## 官方参考
 

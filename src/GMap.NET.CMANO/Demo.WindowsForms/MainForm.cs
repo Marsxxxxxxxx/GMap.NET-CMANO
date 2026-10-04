@@ -26,7 +26,7 @@ using GMap.NET.WindowsForms.ToolTips;
 
 namespace Demo.WindowsForms;
 
-public class MainForm : Form
+public partial class MainForm : Form
 {
 	private readonly GMapOverlay top = new GMapOverlay();
 
@@ -405,12 +405,15 @@ public class MainForm : Form
 				MainMap.MouseUp += MainMap_MouseUp;
 				MainMap.MouseDoubleClick += MainMap_MouseDoubleClick;
 				comboBoxMapType.ValueMember = "Name";
-				comboBoxMapType.DataSource = GMapProviders.List;
+				var availableProviders = new List<GMapProvider>(GMapProviders.List);
+				if (!availableProviders.Contains(initialProvider)) availableProviders.Add(initialProvider);
+				comboBoxMapType.DataSource = availableProviders;
 				comboBoxMapType.SelectedItem = MainMap.MapProvider;
 				comboBoxMode.DataSource = Enum.GetValues(typeof(AccessMode));
 				comboBoxMode.SelectedItem = MainMap.Manager.Mode;
-				textBoxLat.Text = MainMap.Position.Lat.ToString(CultureInfo.InvariantCulture);
-				textBoxLng.Text = MainMap.Position.Lng.ToString(CultureInfo.InvariantCulture);
+				textBoxLat.Text = MainMap.Position.Lat.ToString("F6", CultureInfo.InvariantCulture);
+				textBoxLng.Text = MainMap.Position.Lng.ToString("F6", CultureInfo.InvariantCulture);
+				SetDmsInputs(MainMap.Position);
 				checkBoxUseRouteCache.Checked = MainMap.Manager.UseRouteCache;
 				MobileLogFrom.Value = DateTime.Today;
 				MobileLogTo.Value = DateTime.Now;
@@ -446,6 +449,8 @@ public class MainForm : Form
 				currentMarker = new GMarkerGoogle(MainMap.Position, GMarkerGoogleType.arrow);
 				currentMarker.IsHitTestVisible = false;
 				top.Markers.Add(currentMarker);
+				checkBoxCurrentMarker.Checked = true;
+				UpdateWorkspaceStatus();
 			}
 		}
 	}
@@ -1638,9 +1643,11 @@ public class MainForm : Form
 	private void MainForm_Load(object sender, EventArgs e)
 	{
 		trackBar1.Value = checked((int)MainMap.Zoom * 100);
-		Activate();
-		TopMost = true;
-		TopMost = false;
+		var work = Screen.FromControl(this).WorkingArea;
+		MinimumSize = new Size(Math.Min(MinimumSize.Width, work.Width), Math.Min(MinimumSize.Height, work.Height));
+		Size = new Size(Math.Min(Width, work.Width), Math.Min(Height, work.Height));
+		Location = new Point(work.Left + (work.Width - Width) / 2, work.Top + (work.Height - Height) / 2);
+		MainMap.Focus();
 	}
 
 	private void xPanderPanel1_Click(object sender, EventArgs e)
@@ -1705,18 +1712,13 @@ public class MainForm : Form
 
 	private void button8_Click(object sender, EventArgs e)
 	{
-		try
+		if (!TryCoordinate(textBoxLat.Text, out double lat) || !TryCoordinate(textBoxLng.Text, out double lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180)
 		{
-			double lat = double.Parse(textBoxLat.Text, CultureInfo.InvariantCulture);
-			double lng = double.Parse(textBoxLng.Text, CultureInfo.InvariantCulture);
-			MainMap.Position = new PointLatLng(lat, lng);
+			MessageBox.Show(this, "请输入有效坐标：纬度 −90～90，经度 −180～180。", "定位地图", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			return;
 		}
-		catch (Exception ex)
-		{
-			MessageBox.Show("incorrect coordinate format: " + ex.Message);
-		}
+		MainMap.Position = new PointLatLng(lat, lng);
 	}
-
 	private void textBoxGeo_KeyPress(object sender, KeyPressEventArgs e)
 	{
 		if (e.KeyChar == '\r')
@@ -1934,6 +1936,10 @@ public class MainForm : Form
 
 	private void button13_Click(object sender, EventArgs e)
 	{
+		foreach (Form owned in OwnedForms)
+		{
+			if (owned is StaticImage && !owned.IsDisposed) { owned.Activate(); return; }
+		}
 		StaticImage staticImage = new StaticImage(this);
 		staticImage.Owner = this;
 		staticImage.Show();
@@ -1965,6 +1971,7 @@ public class MainForm : Form
 
 	private void MainForm_KeyUp(object sender, KeyEventArgs e)
 	{
+		if (!MainMap.Focused) return;
 		int num = -22;
 		checked
 		{
@@ -2231,15 +2238,13 @@ public class MainForm : Form
 	{
 		try
 		{
-			string arguments = "/select, \"" + MainMap.CacheLocation + "TileDBv5\"";
-			Process.Start("explorer.exe", arguments);
+			Process.Start(new ProcessStartInfo { FileName = MainMap.CacheLocation, UseShellExecute = true });
 		}
-		catch (Exception ex)
+		catch (Exception error)
 		{
-			MessageBox.Show("Failed to open: " + ex.Message, "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+			MessageBox.Show(this, "无法打开缓存文件夹：" + error.Message, "本地缓存", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 	}
-
 	private void checkBoxTileHost_CheckedChanged(object sender, EventArgs e)
 	{
 		if (checkBoxTileHost.Checked)
@@ -2261,6 +2266,7 @@ public class MainForm : Form
 
 	private void textBoxLat_TextChanged(object sender, EventArgs e)
 	{
+		if (sender is Control input && !input.Focused) return;
 		textBoxLat.TextChanged -= textBoxLat_TextChanged;
 		try
 		{
@@ -2275,6 +2281,7 @@ public class MainForm : Form
 
 	private void textBoxLng_TextChanged(object sender, EventArgs e)
 	{
+		if (sender is Control input && !input.Focused) return;
 		textBoxLng.TextChanged -= textBoxLng_TextChanged;
 		try
 		{
@@ -2289,26 +2296,25 @@ public class MainForm : Form
 
 	private void buttonDraw_Click(object sender, EventArgs e)
 	{
-		double lat = Stuff.ConvertDegreeAngleToDouble(textBoxTLLatDegree, textBoxTLLatMinute, textBoxTLLatSecond, isLatitude: true);
-		double lng = Stuff.ConvertDegreeAngleToDouble(textBoxTLLngDegree, textBoxTLLngMinute, textBoxTLLngSecond, isLatitude: false);
-		double lat2 = Stuff.ConvertDegreeAngleToDouble(textBoxBRLatDegree, textBoxBRLatMinute, textBoxBRLatSecond, isLatitude: true);
-		double lng2 = Stuff.ConvertDegreeAngleToDouble(textBoxBRLngDegree, textBoxBRLngMinute, textBoxBRLngSecond, isLatitude: false);
-		PointLatLng pointLatLng = new PointLatLng(lat, lng);
-		PointLatLng pointLatLng2 = new PointLatLng(lat2, lng2);
-		double num = Math.Min(pointLatLng.Lng, pointLatLng2.Lng);
-		double num2 = Math.Max(pointLatLng.Lat, pointLatLng2.Lat);
-		double num3 = Math.Max(pointLatLng.Lng, pointLatLng2.Lng);
-		double num4 = Math.Min(pointLatLng.Lat, pointLatLng2.Lat);
-		MainMap.SelectedArea = new RectLatLng(num2, num, num3 - num, num2 - num4);
-		MainMap.Refresh();
+		double north = Stuff.ConvertDegreeAngleToDouble(textBoxTLLatDegree, textBoxTLLatMinute, textBoxTLLatSecond, true);
+		double west = Stuff.ConvertDegreeAngleToDouble(textBoxTLLngDegree, textBoxTLLngMinute, textBoxTLLngSecond, false);
+		double south = Stuff.ConvertDegreeAngleToDouble(textBoxBRLatDegree, textBoxBRLatMinute, textBoxBRLatSecond, true);
+		double east = Stuff.ConvertDegreeAngleToDouble(textBoxBRLngDegree, textBoxBRLngMinute, textBoxBRLngSecond, false);
+		if (!TryCreateSelection(north.ToString(CultureInfo.InvariantCulture), west.ToString(CultureInfo.InvariantCulture), south.ToString(CultureInfo.InvariantCulture), east.ToString(CultureInfo.InvariantCulture), out var area, out string error))
+		{
+			MessageBox.Show(this, error, "度分秒选区", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			return;
+		}
+		SetWorkspaceSelection(area);
+		UpdateWorkspaceStatus();
 	}
-
 	protected override void Dispose(bool disposing)
 	{
 		if (disposing && components != null)
 		{
 			components.Dispose();
 		}
+		if (disposing) panel4?.Dispose();
 		base.Dispose(disposing);
 	}
 
@@ -3652,7 +3658,7 @@ public class MainForm : Form
 		this.MinimumSize = new System.Drawing.Size(554, 106);
 		base.Name = "MainForm";
 		base.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-		this.Text = "GMap.NET CMANO - 2.1.7 Preview 3";
+		this.Text = "GMap.NET CMANO - 2.1.7 Preview 4";
 		base.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 		base.Load += new System.EventHandler(this.MainForm_Load);
 		base.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MainForm_KeyPress);
@@ -3685,6 +3691,7 @@ public class MainForm : Form
 		this.tableLayoutPanel3.ResumeLayout(false);
 		this.tableLayoutPanel3.PerformLayout();
 		((System.ComponentModel.ISupportInitialize)this.GridConnections).EndInit();
+		InitializeModernWorkspace();
 		base.ResumeLayout(false);
 	}
 }
