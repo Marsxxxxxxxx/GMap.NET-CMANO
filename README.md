@@ -6,11 +6,19 @@
 
 ## 运行
 
-1. 解压整个 `GMap.NET.CMANO-2.1.7-cmano.2-preview.zip`。
+1. 解压整个 `GMap.NET.CMANO-2.1.7-cmano.3-preview.zip`。
 2. 保留同目录下的所有 DLL，以及 `x86` / `x64` 等子目录。
 3. 启动 `GMap.NET_CMANO.exe`。需要 Windows 和 **.NET Framework 4.8**；运行程序不需要 .NET 10 SDK。
 
 当前工作目录根部的原始 1.7.5 程序保持原样。不要把新版 DLL 单独覆盖到旧 EXE 旁边；升级版应从自己的解压目录运行。
+
+## 缓存位置
+
+Preview 3 默认在 EXE 所在目录下创建 `cache/`，地图瓦片数据库、地理编码/路线缓存和 IP 查询缓存都使用这个位置。例如从 `Release/GMap.NET_CMANO.exe` 启动时，缓存位于 `Release/cache/`。从快捷方式或其他工作目录启动也使用同一个 EXE 相对路径。
+
+程序目录需要允许当前用户写入。推荐把完整运行包放在自己的工具目录。需要保留原有缓存时，关闭程序，将 `%LOCALAPPDATA%/GMap.NET/` 中的内容复制到新 `cache/` 中，保留 `TileDBv5/` 等子目录结构。程序首次使用新位置时不会自动复制旧缓存。
+
+`cache/` 已加入 Git 忽略规则，构建打包也会排除已生成的缓存内容。
 
 ## 4K 屏幕与高 DPI
 
@@ -34,6 +42,7 @@ Preview 2 在 Windows 10 1703 及更新版本（包括 Windows 11）上启用 `P
 - 移除旧 IP 查询演示功能中硬编码的第三方密钥；该可选演示只在设置 `GMAP_IPINFODB_API_KEY` 时尝试工作，其旧服务本身尚未验证。
 - 提供离线验证、独立运行包和 GitHub Actions 构建配置。
 - Preview 2 增加高 DPI 配置、窗口与自绘面板缩放，并验证 150% 下的实际界面布局。
+- Preview 3 将默认缓存移至 EXE 同目录的 cache/，增加实际 SQLite 缓存读写验证。
 
 ## 当前验证范围
 

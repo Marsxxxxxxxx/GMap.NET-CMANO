@@ -44,8 +44,11 @@ internal static class Program
 
             GMaps.Instance.Mode = AccessMode.ServerOnly;
             var provider = new SyntheticProvider();
-            using var form = new DpiChecks.OffscreenMainForm(provider, Path.Combine(output, "cache"));
+            CacheChecks.VerifyDefault(provider, output);
+            using var form = new DpiChecks.OffscreenMainForm(provider, Path.Combine(output, "cache override"));
             Assert(form.MainMap.MapProvider == provider, "Injected offline map provider");
+            CacheChecks.VerifyPaths(form, Path.Combine(output, "cache override"));
+            Console.WriteLine("PASS explicit cache override retained");
             form.CreateControl();
             Console.WriteLine("PASS main form and resources constructed");
             DpiChecks.Verify(form, output);

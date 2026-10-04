@@ -367,14 +367,14 @@ public class MainForm : Form
 	internal MainForm(GMapProvider initialProvider, string cacheLocation = null)
 	{
 		InitializeComponent();
-		if (cacheLocation != null)
-		{
-			MainMap.CacheLocation = cacheLocation;
-		}
 		checked
 		{
 			if (!GMapControl.IsDesignerHosted)
 			{
+				// Resolve from the executable, since shortcuts can use a different working directory.
+				string cachePath = Path.GetFullPath(cacheLocation ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache"));
+				Directory.CreateDirectory(cachePath);
+				MainMap.CacheLocation = cachePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
 				// Tile requests determine connectivity. An unrelated ICMP probe can fail
 				// even when HTTPS map services work, especially behind a proxy.
 				MainMap.MapProvider = initialProvider;
@@ -3652,7 +3652,7 @@ public class MainForm : Form
 		this.MinimumSize = new System.Drawing.Size(554, 106);
 		base.Name = "MainForm";
 		base.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-		this.Text = "GMap.NET CMANO - 2.1.7 Preview 2 (High DPI)";
+		this.Text = "GMap.NET CMANO - 2.1.7 Preview 3";
 		base.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 		base.Load += new System.EventHandler(this.MainForm_Load);
 		base.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MainForm_KeyPress);
