@@ -33,10 +33,10 @@ try {
     $testRun.Refresh()
     Get-Content -LiteralPath (Join-Path $testOutput 'stdout.log')
     Get-Content -LiteralPath (Join-Path $testOutput 'stderr.log')
-    if ($testRun.ExitCode -ne 0) { throw 'Smoke tests failed.' }
+    if ($testRun.ExitCode -ne 0) { throw ('Smoke tests failed (exit code ' + $testRun.ExitCode + '). Logs and screenshots: ' + $testOutput) }
 
     $appOutput = Join-Path $projectRoot ('src\GMap.NET.CMANO\bin\' + $Configuration + '\net48')
-    $packageName = 'GMap.NET.CMANO-2.1.7-cmano.7-preview'
+    $packageName = 'GMap.NET.CMANO-2.1.7-cmano.8-preview'
     $staging = Join-Path $projectRoot ('artifacts\package-' + $runId)
     $package = Join-Path $staging $packageName
     $dist = Join-Path $projectRoot 'dist'

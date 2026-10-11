@@ -22,8 +22,19 @@ jobs:
         run: ./scripts/build.ps1
       - uses: actions/upload-artifact@v7.0.1
         with:
-          name: GMap.NET.CMANO-2.1.7-cmano.7-preview
+          name: GMap.NET.CMANO-2.1.7-cmano.8-preview
           path: |
             dist/*.zip
             dist/*.sha256
           if-no-files-found: error
+      - name: Upload smoke-test logs and screenshots
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: GMap.NET.CMANO-smoke-diagnostics
+          path: |
+            artifacts/smoke-*/stdout.log
+            artifacts/smoke-*/stderr.log
+            artifacts/smoke-*/layout-*.txt
+            artifacts/smoke-*/ui-*.png
+          if-no-files-found: warn

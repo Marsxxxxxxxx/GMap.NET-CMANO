@@ -21,8 +21,8 @@
 本机目录曾出现属主与当前 Windows 账号不一致的情况。下面的 `$projectGitArgs` 只对每次命令信任这个已知项目目录，不修改全局信任列表。
 
 ```powershell
-Set-Location 'C:\Users\Levitate\Documents\GitHub\GMap.NET-CMANO'
-$projectGitArgs = @('-c', 'safe.directory=C:/Users/Levitate/Documents/GitHub/GMap.NET-CMANO')
+Set-Location 'D:\WorkFlow\Projects\GMap.NET-CMANO'
+$projectGitArgs = @('-c', 'safe.directory=D:/WorkFlow/Projects/GMap.NET-CMANO')
 
 # 将两项示例替换成你的真实提交者信息后执行。
 git @projectGitArgs config --local user.name '你的显示名称'
@@ -67,11 +67,11 @@ git @projectGitArgs push -u origin main
 2. 编译 .NET Framework 4.8 程序。
 3. 离线验证地图程序集版本、界面资源、SQLite 与 PNG/PGW 导出。
 4. 生成包含 EXE、DLL 和原生依赖的 ZIP，以及 SHA-256 校验文件。
-5. 上传名为 `GMap.NET.CMANO-2.1.7-cmano.7-preview` 的构建产物。
+5. 上传名为 `GMap.NET.CMANO-2.1.7-cmano.8-preview` 的构建产物。
 
 进入仓库 **Actions → Build and verify Windows package → 某次运行记录**。成功后在 **Artifacts** 中下载产物。下载的外层归档内包含运行包 ZIP 和校验文件；再将运行包完整解压即可使用。
 
-如果显示红色失败状态，打开失败步骤查看日志。如果需要手动重建，工作流页面提供 **Run workflow**，使用 `main` 分支。若仓库设置禁用了 Actions，先在仓库的 Actions 设置中启用，并允许工作流中使用的 GitHub 官方 actions。
+如果显示红色失败状态，打开失败步骤查看日志；也可下载 `GMap.NET.CMANO-smoke-diagnostics` 产物，查看各布局场景的实际窗口尺寸、DPI、控件边界及截图。该诊断产物在测试失败时仍会上传。如果需要手动重建，工作流页面提供 **Run workflow**，使用 `main` 分支。若仓库设置禁用了 Actions，先在仓库的 Actions 设置中启用，并允许工作流中使用的 GitHub 官方 actions。
 
 当前配置不需要你添加个人访问令牌或自定义 Secrets。工作流只读取源码并上传构建产物，没有调用发布 Release 的 API。
 
@@ -81,8 +81,8 @@ git @projectGitArgs push -u origin main
 
 建议先下载一次绿色成功运行的产物，确认真实地图和游戏导入结果。然后进入仓库 **Releases → Draft a new release**：
 
-1. 选择对应的提交创建标签，例如 `v2.1.7-cmano.7-preview`。如果选 `main`，先确认它仍指向生成该运行包的提交；之后不要移动已经发布的标签。
-2. 标题填写 `GMap.NET CMANO 2.1.7 — Preview 7`，说明这次升级内容、验证范围和已知限制。
+1. 选择对应的提交创建标签，例如 `v2.1.7-cmano.8-preview`。如果选 `main`，先确认它仍指向生成该运行包的提交；之后不要移动已经发布的标签。
+2. 标题填写 `GMap.NET CMANO 2.1.7 — Preview 8`，说明这次升级内容、验证范围和已知限制。
 3. 将构建产物中的运行包 ZIP 及 `.sha256` 文件上传为附件。
 4. 本版勾选 **Set as a pre-release**，检查附件后发布。
 
@@ -95,8 +95,8 @@ Actions 产物按仓库设置的期限保留；适合长期按版本管理的运
 开始修改前，可在工作目录干净的情况下同步远程修改：
 
 ```powershell
-Set-Location 'C:\Users\Levitate\Documents\GitHub\GMap.NET-CMANO'
-$projectGitArgs = @('-c', 'safe.directory=C:/Users/Levitate/Documents/GitHub/GMap.NET-CMANO')
+Set-Location 'D:\WorkFlow\Projects\GMap.NET-CMANO'
+$projectGitArgs = @('-c', 'safe.directory=D:/WorkFlow/Projects/GMap.NET-CMANO')
 git @projectGitArgs pull --ff-only
 ```
 
@@ -113,7 +113,7 @@ git @projectGitArgs push
 
 本地构建失败时先修复再继续。推送会再次触发 Actions；等该次运行成功并验证地图导出效果后，再发布一个新版本。
 
-当前应用维护版本和 GMap.NET 库版本是分别管理的。例如后续可发布 `2.1.7-cmano.8-preview`，同时继续使用 GMap.NET 2.1.7。发新版本时同步修改 `Properties/AssemblyInfo.cs` 中的应用版本、构建脚本的 `$packageName`、工作流的产物名称及 `CHANGELOG.md`；Release 标签与运行包对应。
+当前应用维护版本和 GMap.NET 库版本是分别管理的。例如后续可发布 `2.1.7-cmano.9-preview`，同时继续使用 GMap.NET 2.1.7。发新版本时同步修改 `Properties/AssemblyInfo.cs` 中的应用版本、构建脚本的 `$packageName`、工作流的产物名称及 `CHANGELOG.md`；Release 标签与运行包对应。
 
 ## 官方参考
 

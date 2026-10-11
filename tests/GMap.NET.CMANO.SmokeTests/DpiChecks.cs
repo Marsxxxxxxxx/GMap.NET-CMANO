@@ -23,18 +23,66 @@ internal static class DpiChecks
         }
         form.WindowState = FormWindowState.Normal; form.StartPosition = FormStartPosition.Manual;
         form.Location = new Point(-20000, -20000); form.ShowInTaskbar = false;
-        form.ClientSize = LogicalSize(form, 1440, 1000); form.Show(); form.PerformLayout(); Pump(); form.Refresh();
-        var sidebar = Find(form, "workspaceSidebar"); var map = Find(form, "MainMap");
-        Assert(Math.Abs(sidebar.Width - 360 * form.DeviceDpi / 96.0) <= 1, "Sidebar must scale exactly once at the display DPI");
-        Assert(map.Width > 600 * form.DeviceDpi / 96.0 && map.Height > 500 * form.DeviceDpi / 96.0, "Map must occupy the available workspace");
-        VerifyVisibleControls(form);
-        Capture(form, Path.Combine(output, "ui-current-dpi.png")); Capture(sidebar, Path.Combine(output, "ui-menu-current-dpi.png"));
-        form.ClientSize = LogicalSize(form, 1040, 720); form.PerformLayout(); Pump();
-        Assert(map.Width > 500 * form.DeviceDpi / 96.0 && map.Height > 400 * form.DeviceDpi / 96.0, "Minimum window size must retain a usable map");
-        VerifyVisibleControls(form); Capture(form, Path.Combine(output, "ui-compact-current-dpi.png"));
-        form.ClientSize = LogicalSize(form, 1440, 1000); form.PerformLayout();
+        form.Show();
+        VerifyWorkspaceLayout(form, output, "normal", 1440, 1000, "ui-current-dpi.png");
+        Capture(Find(form, "workspaceSidebar"), Path.Combine(output, "ui-menu-current-dpi.png"));
+        VerifyWorkspaceLayout(form, output, "compact", 1040, 720, "ui-compact-current-dpi.png");
+
+        // Exercise the client area observed on a CI-sized desktop without changing
+        // the user's display. The map must fill this area even though it is smaller
+        // than the requested normal layout.
+        VerifyWorkspaceLayout(form, output, "constrained", 1024, 749, "ui-constrained-current-dpi.png");
+        Assert(form.ClientSize.Width < 1440 * form.DeviceDpi / 96 ||
+            form.ClientSize.Height < 1000 * form.DeviceDpi / 96,
+            "The constrained-window scenario must exercise a smaller client area");
+        form.ClientSize = LogicalSize(form, 1440, 1000); form.PerformLayout(); Pump();
         VerifyCaptionScaling();
-        Console.WriteLine("PASS native workspace at " + form.DeviceDpi + " DPI, normal/compact layouts and original caption scaling");
+        Console.WriteLine("PASS native workspace at " + form.DeviceDpi + " DPI, normal/compact/constrained layouts, map fills its available space and original caption scaling");
+    }
+
+    private static void VerifyWorkspaceLayout(MainForm form, string output, string scenario,
+        int width, int height, string screenshot)
+    {
+        var requested = LogicalSize(form, width, height);
+        form.ClientSize = requested; form.PerformLayout(); Pump(); form.Refresh();
+        var sidebar = Find(form, "workspaceSidebar");
+        var map = Find(form, "MainMap");
+        var workspace = (TableLayoutPanel)Find(form, "mapWorkspace");
+        string geometry = "LAYOUT " + scenario + ": DPI=" + form.DeviceDpi +
+            "; requested client=" + requested + "; actual client=" + form.ClientSize +
+            "; maximum track=" + SystemInformation.MaxWindowTrackSize +
+            "; working area=" + Screen.FromControl(form).WorkingArea + "; map=" + map.Bounds;
+        Console.WriteLine(geometry);
+        using (var diagnostics = new StreamWriter(Path.Combine(output, "layout-" + scenario + ".txt")))
+        {
+            diagnostics.WriteLine(geometry);
+            WriteControlBounds(form, diagnostics, 0);
+        }
+        // Capture before asserting so failed CI runs retain the layout that failed.
+        Capture(form, Path.Combine(output, screenshot));
+        Assert(Math.Abs(sidebar.Width - 360 * form.DeviceDpi / 96.0) <= 1,
+            "Sidebar must scale exactly once at the display DPI: " + geometry);
+        Assert(map.Width >= 500 * form.DeviceDpi / 96.0 && map.Height >= 400 * form.DeviceDpi / 96.0 &&
+            map.Width > form.ClientSize.Width / 2 && map.Height > form.ClientSize.Height / 2,
+            "Map must retain a usable size and occupy most of the client area: " + geometry);
+        Assert(map.Dock == DockStyle.Fill &&
+            map.Width == workspace.DisplayRectangle.Width - map.Margin.Horizontal &&
+            map.Height == workspace.GetRowHeights()[workspace.GetRow(map)] - map.Margin.Vertical,
+            "Map must fill the space available in its workspace: " + geometry);
+        for (Control child = map; child.Parent != null; child = child.Parent)
+            Assert(child.Parent.ClientRectangle.Contains(child.Bounds),
+                "Map workspace must remain within " + child.Parent.Name + ": " + child.Bounds +
+                " parent=" + child.Parent.ClientRectangle + "; " + geometry);
+        VerifyVisibleControls(form);
+    }
+
+    private static void WriteControlBounds(Control control, TextWriter writer, int depth)
+    {
+        writer.WriteLine(new string(' ', depth * 2) + control.GetType().Name + " " + control.Name +
+            ": bounds=" + control.Bounds + "; client=" + control.ClientRectangle +
+            "; visible=" + control.Visible + "; DPI=" + control.DeviceDpi);
+        foreach (Control child in control.Controls)
+            if (child.Visible) WriteControlBounds(child, writer, depth + 1);
     }
 
     internal static void VerifyExportWindow(StaticImage form, string output)
